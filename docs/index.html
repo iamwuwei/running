@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>富士山マラソン 2026</title>
+<meta name="description" content="富士山マラソン 2026 訓練紀錄：每日跑步報告、下次練習、歷史紀錄">
+<style>
+:root{
+  --bg:#fff; --surface:#fff; --ink:#0a0a0a; --ink-2:#555; --ink-3:#999;
+  --line:#e6e6e6; --chip:#f2f2f2; --accent:#1d6fe0; --accent-soft:#e3edfb;
+  --good:#1a8f4e; --good-soft:#e2f4ea; --warn:#c7700a; --warn-soft:#fbeedc;
+  --track:#ececec;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#000; --surface:#000; --ink:#f3f3f3; --ink-2:#a8a8a8; --ink-3:#6f6f6f;
+    --line:#262626; --chip:#161616; --accent:#6ea2ff; --accent-soft:#132544;
+    --good:#4ccb84; --good-soft:#0f2a1b; --warn:#f0a44a; --warn-soft:#2e1f0a;
+    --track:#1f1f1f;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Helvetica Neue","Hiragino Sans","Noto Sans CJK TC","PingFang TC",sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:600px;margin:0 auto;padding:0 16px env(safe-area-inset-bottom)}
+header{position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:52px}
+header h1{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
+header .count{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.hero{padding:20px 0 16px;border-bottom:1px solid var(--line)}
+.hero .big{display:flex;align-items:baseline;gap:6px}
+.hero .big b{font-size:34px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hero .big span{color:var(--ink-2)}
+.hero .sub{color:var(--ink-2);font-size:13px;margin-top:2px}
+.bar{height:6px;background:var(--track);border-radius:4px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px;width:0;transition:width .6s ease}
+.bar.done i{background:var(--good)}
+h2{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin:22px 0 6px}
+.post{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.post.plain{border-bottom:1px solid var(--line)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:18px}
+.avatar.hi{background:var(--accent-soft)}
+.meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px}
+.meta b{font-weight:600}
+.meta .dim{color:var(--ink-3)}
+.tag{font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:var(--chip);color:var(--ink-2)}
+.tag.accent{background:var(--accent-soft);color:var(--accent)}
+.tag.good{background:var(--good-soft);color:var(--good)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.body{margin-top:4px}
+.body p{margin:4px 0}
+.title{font-size:16px;font-weight:600;margin:2px 0 4px}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 6px}
+.stat{background:var(--chip);border-radius:10px;padding:8px 10px}
+.stat b{display:block;font-size:17px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--ink-3)}
+.verdict{display:flex;gap:8px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--chip);font-size:14px}
+.verdict.good{background:var(--good-soft)} .verdict.warn{background:var(--warn-soft)}
+.verdict .dot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--ink-3)}
+.verdict.good .dot{background:var(--good)} .verdict.warn .dot{background:var(--warn)}
+ul.points{margin:8px 0 0;padding-left:0;list-style:none;color:var(--ink-2);font-size:14px}
+ul.points li{padding-left:14px;position:relative;margin:3px 0}
+ul.points li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
+.memo{margin-top:8px;font-size:15px}
+.foot{color:var(--ink-3);font-size:12px;margin-top:8px}
+.week{padding:12px 0;border-bottom:1px solid var(--line)}
+.week .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.week .row b{font-weight:600}
+.week .row .num{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:13px}
+.week .focus{color:var(--ink-3);font-size:12px;margin-top:2px}
+.week.now .row b::after{content:"本週";margin-left:6px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:999px}
+.week.future{opacity:.6}
+.next-list .post:first-child .avatar{background:var(--accent-soft)}
+.empty{color:var(--ink-3);padding:14px 0;border-bottom:1px solid var(--line)}
+footer{padding:28px 0 40px;color:var(--ink-3);font-size:12px;text-align:center}
+footer a{color:var(--ink-2)}
+details summary{cursor:pointer;color:var(--ink-2);font-size:13px;padding:12px 0;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:" ▾"} details[open] summary::after{content:" ▴"}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>🗻 富士山マラソン 2026</h1><div class="count" id="countdown"></div></div></header>
+<main class="wrap">
+  <section class="hero" id="hero"></section>
+
+  <h2>今天</h2>
+  <div id="today"></div>
+
+  <h2>下次練習</h2>
+  <div id="next" class="next-list"></div>
+
+  <h2>最新報告</h2>
+  <div id="latest"></div>
+
+  <h2>週進度</h2>
+  <div id="weeks"></div>
+
+  <h2>歷史紀錄</h2>
+  <div id="history"></div>
+</main>
+<footer>
+  資料更新：<span id="built"></span><br>
+  <a href="https://github.com/iamwuwei/running" target="_blank" rel="noopener">GitHub</a> ·
+  <a href="https://github.com/iamwuwei/running/raw/main/%E5%AF%8C%E5%A3%AB%E5%B1%B1%E9%A6%AC%E6%8B%89%E6%9D%BE_2026_%E8%AA%B2%E8%A1%A8.xlsx">下載 Excel</a>
+</footer>
+<script id="data" type="application/json">{"race_day": "2026-12-14", "built": "2026/10/10 12:00 JST", "rows": [{"week": 1, "date": "2026-10-08", "dow": "四", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": "新鞋/舊鞋都行，先把習慣建起來", "actual_km": 7.27, "done": true, "memo": "照課表跑，最後小走一段。Strava 判定 5K PB，心拍偏高（閾值區 79%）", "time": "45:29", "pace": "6:15", "hr": 169.0, "hr_max": 176.0, "power": 171.0, "kcal": 498.0, "weather": "晴れ 19°C / 濕度 77% / 東南東風 5 km/h", "shoes": "Adidas EVO SL", "device": "Apple Watch Series 11", "is_rest": false, "analysis": {"verdict": "跑太快，心拍也飆了。下次 Easy 再慢一點", "status": "warn", "points": ["距離 7.27 km，比課表多 1.27 km（+21%）", "配速 6:15，比目標下限 7:15 快 60 秒/km", "平均心拍 169，超過上限 150 有 19 bpm（最高 176）"]}}, {"week": 1, "date": "2026-10-09", "dow": "五", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 1, "date": "2026-10-10", "dow": "六", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 5.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 5 km", "note": null, "actual_km": 5.22, "done": true, "memo": "第一次成功壓住心拍的 Easy，GAP 7:03。第1km 6:23 偏快，後段心拍 141→156 微爬。路線爬升 91m 適合富士山", "time": "38:40", "pace": "7:25", "hr": 150.0, "hr_max": 160.0, "power": null, "kcal": 355.0, "weather": "晴 19°C / 體感 21°C / 濕度 77% / 北風 7.2 km/h", "shoes": "Adidas EVO SL", "device": "Apple Watch Series 11", "is_rest": false, "analysis": {"verdict": "完美執行，照課表的強度跑完", "status": "good", "points": ["距離 5.22 km，照課表完成", "配速 7:25，落在目標 7:15〜7:45 內", "平均心拍 150，在目標 140〜150 內（最高 160）"]}}, {"week": 1, "date": "2026-10-11", "dow": "日", "phase": "第一階段｜重建跑量", "type": "Long", "plan_km": 12.0, "target": "7:20〜7:50", "content": "長跑 12 km，全程聊天配速", "note": "跑完記錄心拍，當基準", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 2, "date": "2026-10-12", "dow": "一", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 2, "date": "2026-10-13", "dow": "二", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 2, "date": "2026-10-14", "dow": "三", "phase": "第一階段｜重建跑量", "type": "MP", "plan_km": 7.0, "target": "MP 段 6:35〜6:50", "content": "2 km Easy + 3 km @ MP + 2 km Easy", "note": "MP 段心拍不要超過 165", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 2, "date": "2026-10-15", "dow": "四", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 2, "date": "2026-10-16", "dow": "五", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 2, "date": "2026-10-17", "dow": "六", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 2, "date": "2026-10-18", "dow": "日", "phase": "第一階段｜重建跑量", "type": "Long", "plan_km": 14.0, "target": "7:15〜7:45", "content": "長跑 14 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 3, "date": "2026-10-19", "dow": "一", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 3, "date": "2026-10-20", "dow": "二", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 3, "date": "2026-10-21", "dow": "三", "phase": "第一階段｜重建跑量", "type": "坡跑", "plan_km": 8.0, "target": "上坡 6:00 以內 / 下坡慢跑", "content": "2 km Easy + 5×90 秒上坡（慢跑下坡回復）+ 2 km Easy", "note": "模擬富士山 20〜30 km 河口湖→西湖爬坡", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 3, "date": "2026-10-22", "dow": "四", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 3, "date": "2026-10-23", "dow": "五", "phase": "第一階段｜重建跑量", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 3, "date": "2026-10-24", "dow": "六", "phase": "第一階段｜重建跑量", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 3, "date": "2026-10-25", "dow": "日", "phase": "第一階段｜重建跑量", "type": "Long", "plan_km": 16.0, "target": "7:10〜7:40", "content": "長跑 16 km", "note": "找有起伏的路線（駒沢、代代木）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 4, "date": "2026-10-26", "dow": "一", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 4, "date": "2026-10-27", "dow": "二", "phase": "第二階段｜馬拉松訓練", "type": "Easy", "plan_km": 7.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 7 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 4, "date": "2026-10-28", "dow": "三", "phase": "第二階段｜馬拉松訓練", "type": "MP", "plan_km": 8.0, "target": "MP 段 6:40〜6:50", "content": "3 km Easy + 4 km @ MP + 1 km Easy", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 4, "date": "2026-10-29", "dow": "四", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 4, "date": "2026-10-30", "dow": "五", "phase": "第二階段｜馬拉松訓練", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 4, "date": "2026-10-31", "dow": "六", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 4, "date": "2026-11-01", "dow": "日", "phase": "第二階段｜馬拉松訓練", "type": "Long", "plan_km": 18.0, "target": "7:10〜7:40 / 心拍 ≤155", "content": "長跑 18 km ★開始練補給", "note": "每 40 分 1 包能量膠＋水，測試腸胃；穿比賽衣褲", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 5, "date": "2026-11-02", "dow": "一", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 5, "date": "2026-11-03", "dow": "二", "phase": "第二階段｜馬拉松訓練", "type": "Easy", "plan_km": 7.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 7 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 5, "date": "2026-11-04", "dow": "三", "phase": "第二階段｜馬拉松訓練", "type": "坡跑", "plan_km": 8.0, "target": "上坡 6:00 以內", "content": "2 km Easy + 6×90 秒上坡 + 2 km Easy", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 5, "date": "2026-11-05", "dow": "四", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 5, "date": "2026-11-06", "dow": "五", "phase": "第二階段｜馬拉松訓練", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 5, "date": "2026-11-07", "dow": "六", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 5, "date": "2026-11-08", "dow": "日", "phase": "第二階段｜馬拉松訓練", "type": "Long", "plan_km": 22.0, "target": "7:10〜7:40 / 心拍 ≤155", "content": "長跑 22 km", "note": "補給照 11/1，加鹽錠或電解質", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 6, "date": "2026-11-09", "dow": "一", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 6, "date": "2026-11-10", "dow": "二", "phase": "第二階段｜馬拉松訓練", "type": "Recovery", "plan_km": 6.0, "target": "7:45+ / 心拍 ≤140", "content": "恢復跑 6 km 非常慢", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 6, "date": "2026-11-11", "dow": "三", "phase": "第二階段｜馬拉松訓練", "type": "MP", "plan_km": 9.0, "target": "MP 段 6:40〜6:50", "content": "2 km Easy + 6 km @ MP + 1 km Easy", "note": "第一次連續 6 km MP，看心拍能否守在 165 以下", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 6, "date": "2026-11-12", "dow": "四", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 6, "date": "2026-11-13", "dow": "五", "phase": "第二階段｜馬拉松訓練", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 6, "date": "2026-11-14", "dow": "六", "phase": "第二階段｜馬拉松訓練", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 6, "date": "2026-11-15", "dow": "日", "phase": "第二階段｜馬拉松訓練", "type": "Long", "plan_km": 26.0, "target": "7:10〜7:40 / 心拍 ≤155", "content": "長跑 26 km", "note": "超過 2.5 小時就停，不硬撐距離", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 7, "date": "2026-11-16", "dow": "一", "phase": "第三階段｜Peak", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 7, "date": "2026-11-17", "dow": "二", "phase": "第三階段｜Peak", "type": "Easy", "plan_km": 7.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 7 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 7, "date": "2026-11-18", "dow": "三", "phase": "第三階段｜Peak", "type": "坡跑+MP", "plan_km": 10.0, "target": "上坡 6:00 內 / MP 6:40〜6:50", "content": "3 km Easy + 4×90 秒上坡 + 3 km @ MP", "note": "坡後接 MP，模擬西湖爬坡後還要維持配速", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 7, "date": "2026-11-19", "dow": "四", "phase": "第三階段｜Peak", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 7, "date": "2026-11-20", "dow": "五", "phase": "第三階段｜Peak", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 7, "date": "2026-11-21", "dow": "六", "phase": "第三階段｜Peak", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 7, "date": "2026-11-22", "dow": "日", "phase": "第三階段｜Peak", "type": "Peak Long", "plan_km": 30.0, "target": "前 10 km 7:15〜7:30 / 中 7:00〜7:15 / 後 10 km 6:50〜7:10", "content": "★ 峰值長跑 30 km（比賽預演）", "note": "比賽裝備、補給、起跑時間全部照比賽來。目標：完成且最後 5 km 心拍 <170 還能控制 → 可試 5:00；否則比賽目標改 5:15〜5:30", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 8, "date": "2026-11-23", "dow": "一", "phase": "第三階段｜Peak", "type": "完全休息", "plan_km": 0.0, "target": null, "content": "完全休息，不做肌力", "note": "走路、伸展、睡飽", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 8, "date": "2026-11-24", "dow": "二", "phase": "第三階段｜Peak", "type": "Recovery", "plan_km": 5.0, "target": "7:45+ / 心拍 ≤140", "content": "恢復跑 5 km 非常慢", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 8, "date": "2026-11-25", "dow": "三", "phase": "第三階段｜Peak", "type": "Easy", "plan_km": 7.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 7 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 8, "date": "2026-11-26", "dow": "四", "phase": "第三階段｜Peak", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 8, "date": "2026-11-27", "dow": "五", "phase": "第三階段｜Peak", "type": "Easy", "plan_km": 5.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 5 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 8, "date": "2026-11-28", "dow": "六", "phase": "第三階段｜Peak", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 8, "date": "2026-11-29", "dow": "日", "phase": "第三階段｜Peak", "type": "Long", "plan_km": 20.0, "target": "前 15 km 7:10〜7:30 / 最後 5 km @ MP", "content": "長跑 20 km，最後 5 km @ 6:40〜7:00", "note": "減量週：確認 30 km 後身體已恢復", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 9, "date": "2026-11-30", "dow": "一", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": "休息日：15 分鐘核心＋臀腿（深蹲、臀橋、單腳硬舉、側平板）", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 9, "date": "2026-12-01", "dow": "二", "phase": "第四階段｜Taper", "type": "Easy", "plan_km": 6.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 6 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 9, "date": "2026-12-02", "dow": "三", "phase": "第四階段｜Taper", "type": "MP", "plan_km": 8.0, "target": "MP 段 6:40〜6:50", "content": "3 km Easy + 3 km @ MP + 2 km Easy", "note": "維持配速感覺，不是練體能", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 9, "date": "2026-12-03", "dow": "四", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 9, "date": "2026-12-04", "dow": "五", "phase": "第四階段｜Taper", "type": "Easy", "plan_km": 5.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 5 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 9, "date": "2026-12-05", "dow": "六", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 9, "date": "2026-12-06", "dow": "日", "phase": "第四階段｜Taper", "type": "Long", "plan_km": 14.0, "target": "7:10〜7:40 / 心拍 ≤155", "content": "長跑 14 km", "note": "最後一次穿比賽鞋確認", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 10, "date": "2026-12-07", "dow": "一", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 10, "date": "2026-12-08", "dow": "二", "phase": "第四階段｜Taper", "type": "Easy", "plan_km": 5.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 5 km", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 10, "date": "2026-12-09", "dow": "三", "phase": "第四階段｜Taper", "type": "MP", "plan_km": 6.0, "target": "MP 段 6:40〜6:50", "content": "4 km Easy + 2 km @ MP", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 10, "date": "2026-12-10", "dow": "四", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 10, "date": "2026-12-11", "dow": "五", "phase": "第四階段｜Taper", "type": "快步", "plan_km": 4.0, "target": "7:15〜7:45 / 心拍 140〜150", "content": "輕鬆跑 4 km + 4×20 秒快步", "note": "保持腿的彈性", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}, {"week": 10, "date": "2026-12-12", "dow": "六", "phase": "第四階段｜Taper", "type": "休息", "plan_km": 0.0, "target": null, "content": "休息", "note": null, "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 10, "date": "2026-12-13", "dow": "日", "phase": "第四階段｜Taper", "type": "完全休息", "plan_km": 0.0, "target": null, "content": "完全休息", "note": "前一天抵達河口湖、早睡、裝備排好、早餐吃習慣的", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": true}, {"week": 11, "date": "2026-12-14", "dow": "一", "phase": "比賽日", "type": "比賽", "plan_km": 42.195, "target": "前 10 km 7:05〜7:15 / 10〜20 km 6:55〜7:05 / 西湖爬坡段心拍優先 / 30 km 後視狀況", "content": "🏁 富士山マラソン 42.195 km", "note": "水站走路喝水；每 40 分補膠；26 km 前絕不加速", "actual_km": null, "done": false, "memo": null, "time": null, "pace": null, "hr": null, "hr_max": null, "power": null, "kcal": null, "weather": null, "shoes": null, "device": null, "is_rest": false}], "weeks": [{"week": 1, "start": "2026-10-08", "end": "2026-10-11", "phase": "第一階段｜重建跑量", "plan_km": 23.0, "actual_km": 12.49, "long_km": 12.0, "focus": "開始建立習慣"}, {"week": 2, "start": "2026-10-12", "end": "2026-10-18", "phase": "第一階段｜重建跑量", "plan_km": 33.0, "actual_km": 0.0, "long_km": 14.0, "focus": "長跑 14"}, {"week": 3, "start": "2026-10-19", "end": "2026-10-25", "phase": "第一階段｜重建跑量", "plan_km": 36.0, "actual_km": 0.0, "long_km": 16.0, "focus": "長跑 16，第一次坡跑"}, {"week": 4, "start": "2026-10-26", "end": "2026-11-01", "phase": "第二階段｜馬拉松訓練", "plan_km": 39.0, "actual_km": 0.0, "long_km": 18.0, "focus": "長跑 18，開始練補給"}, {"week": 5, "start": "2026-11-02", "end": "2026-11-08", "phase": "第二階段｜馬拉松訓練", "plan_km": 43.0, "actual_km": 0.0, "long_km": 22.0, "focus": "長跑 22"}, {"week": 6, "start": "2026-11-09", "end": "2026-11-15", "phase": "第二階段｜馬拉松訓練", "plan_km": 47.0, "actual_km": 0.0, "long_km": 26.0, "focus": "長跑 26（長跑最大週前的鋪墊）"}, {"week": 7, "start": "2026-11-16", "end": "2026-11-22", "phase": "第三階段｜Peak", "plan_km": 53.0, "actual_km": 0.0, "long_km": 30.0, "focus": "★ 峰值 30 km 比賽預演"}, {"week": 8, "start": "2026-11-23", "end": "2026-11-29", "phase": "第三階段｜Peak", "plan_km": 37.0, "actual_km": 0.0, "long_km": 20.0, "focus": "減量週，20 km 收尾 MP"}, {"week": 9, "start": "2026-11-30", "end": "2026-12-06", "phase": "第四階段｜Taper", "plan_km": 33.0, "actual_km": 0.0, "long_km": 14.0, "focus": "Taper 1"}, {"week": 10, "start": "2026-12-07", "end": "2026-12-13", "phase": "第四階段｜Taper", "plan_km": 15.0, "actual_km": 0.0, "long_km": 6.0, "focus": "Taper 2"}, {"week": 11, "start": "2026-12-14", "end": "2026-12-14", "phase": "比賽日", "plan_km": 42.195, "actual_km": 0.0, "long_km": 42.195, "focus": "🏁 12/14 比賽"}]}</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtKm = v => v == null ? '–' : (Math.round(v*100)/100).toString();
+// "today" in Japan, independent of the viewer's timezone
+const jst = new Date(Date.now() + 9*3600*1000);
+const today = jst.toISOString().slice(0,10);
+const race = D.race_day;
+const dayDiff = (a,b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+const md = iso => `${+iso.slice(5,7)}/${+iso.slice(8,10)}`;
+const dowName = r => r.dow ? `週${r.dow}` : '';
+const typeTag = r => r.is_rest ? '' : `<span class="tag accent">${esc(r.type)}</span>`;
+
+// ---- header / hero
+const toRace = dayDiff(today, race);
+document.getElementById('countdown').textContent =
+  toRace > 0 ? `比賽倒數 ${toRace} 天` : toRace === 0 ? '比賽日 🏁' : '比賽結束';
+
+const done = D.rows.filter(r => r.actual_km != null);
+const totalActual = done.reduce((s,r) => s + r.actual_km, 0);
+const planToDate = D.rows.filter(r => r.date <= today).reduce((s,r) => s + (r.plan_km||0), 0);
+const planTotal = D.rows.reduce((s,r) => s + (r.plan_km||0), 0);
+const pct = planToDate ? totalActual/planToDate*100 : 0;
+document.getElementById('hero').innerHTML = `
+  <div class="big"><b>${fmtKm(totalActual)}</b><span>km 累積</span></div>
+  <div class="sub">課表至今 ${fmtKm(planToDate)} km · 達成 ${Math.round(pct)}% · ${done.length} 次練習 · 全程計畫 ${fmtKm(planTotal)} km</div>
+  <div class="bar ${pct>=100?'done':''}"><i style="width:${Math.min(100,pct)}%"></i></div>`;
+
+// ---- plan card (today / next)
+function planCard(r, {hi=false, label=''} = {}) {
+  const when = r.date === today ? '今天' : r.date === addDays(today,1) ? '明天' : `${md(r.date)} ${dowName(r)}`;
+  const body = r.is_rest
+    ? `<div class="title">${esc(r.content || '休息')}</div>${r.note ? `<p class="muted">${esc(r.note)}</p>` : ''}`
+    : `<div class="title">${esc(r.content)}</div>
+       <p class="muted">${esc(r.target || '')}</p>
+       ${r.note ? `<p class="muted small">📝 ${esc(r.note)}</p>` : ''}`;
+  return `<article class="post">
+    <div class="avatar ${hi?'hi':''}">${r.is_rest ? '😴' : r.type === '比賽' ? '🏁' : '🏃'}</div>
+    <div><div class="meta"><b>${esc(when)}</b>${label ? `<span class="dim">· ${esc(label)}</span>` : ''} ${typeTag(r)} ${r.plan_km ? `<span class="tag">${fmtKm(r.plan_km)} km</span>` : ''}</div>
+    <div class="body">${body}<div class="foot">第 ${r.week} 週 · ${esc(r.phase)}</div></div></div></article>`;
+}
+function addDays(iso, n){ const d = new Date(Date.parse(iso) + n*86400000); return d.toISOString().slice(0,10); }
+
+// ---- report card (completed run)
+function reportCard(r) {
+  const a = r.analysis || {};
+  const stats = [
+    [`課表\u00a0${fmtKm(r.plan_km)}\u00a0km`, r.actual_km != null ? `${fmtKm(r.actual_km)} km` : null, null],
+    ['時間', r.time, null],
+    ['配速', r.pace ? `${r.pace}/km` : null, null],
+    ['心拍', r.hr != null ? `${Math.round(r.hr)}` : null, r.hr_max ? `最高\u00a0${Math.round(r.hr_max)}` : null],
+    ['卡路里', r.kcal != null ? `${Math.round(r.kcal)}` : null, null],
+    ['功率', r.power != null ? `${Math.round(r.power)} W` : null, null],
+  ].filter(s => s[1]);
+  return `<article class="post">
+    <div class="avatar">🏃</div>
+    <div>
+      <div class="meta"><b>${md(r.date)} ${dowName(r)}</b><span class="dim">· 第 ${r.week} 週</span> ${typeTag(r)}
+        <span class="tag ${a.status||''}">${esc(a.status === 'good' ? '達成' : a.status === 'warn' ? '注意' : '完成')}</span></div>
+      <div class="body">
+        <div class="title">${esc(r.content)}</div>
+        ${r.memo ? `<p class="memo">${esc(r.memo)}</p>` : ''}
+        <div class="stats">${stats.map(([k,v,sub]) => `<div class="stat"><b>${esc(v)}</b><span>${esc(k)}${sub ? ' · ' + esc(sub) : ''}</span></div>`).join('')}</div>
+        ${a.verdict ? `<div class="verdict ${a.status}"><span class="dot"></span><div><b>${esc(a.verdict)}</b>
+          <ul class="points">${(a.points||[]).map(p => `<li>${esc(p)}</li>`).join('')}</ul></div></div>` : ''}
+        <div class="foot">${[r.weather, r.shoes, r.device].filter(Boolean).map(esc).join(' · ')}</div>
+      </div>
+    </div></article>`;
+}
+
+// ---- today
+const todayRow = D.rows.find(r => r.date === today);
+document.getElementById('today').innerHTML = todayRow
+  ? (todayRow.actual_km != null ? reportCard(todayRow) : planCard(todayRow, {hi:true}))
+  : `<div class="empty">${today > race ? '課表已結束，辛苦了 🎉' : '課表還沒開始'}</div>`;
+
+// ---- next workouts: upcoming runs after today (rest days skipped), first 3
+const upcoming = D.rows.filter(r => r.date > today && !r.is_rest).slice(0,3);
+document.getElementById('next').innerHTML = upcoming.length
+  ? upcoming.map((r,i) => planCard(r, {hi:i===0, label: `${dayDiff(today, r.date)} 天後`})).join('')
+  : `<div class="empty">沒有後續課表</div>`;
+
+// ---- latest report
+const shownToday = todayRow && todayRow.actual_km != null ? todayRow : null;
+const rest = done.filter(r => r !== shownToday);
+const latest = rest.length ? rest[rest.length-1] : null;
+document.getElementById('latest').innerHTML = latest ? reportCard(latest)
+  : `<div class="empty">${shownToday ? '今天的就是第一筆紀錄' : '還沒有紀錄'}</div>`;
+
+// ---- weeks
+document.getElementById('weeks').innerHTML = D.weeks.map(w => {
+  const p = w.plan_km ? Math.min(100, w.actual_km / w.plan_km * 100) : 0;
+  const now = today >= w.start && today <= w.end;
+  const future = today < w.start;
+  const complete = w.actual_km >= w.plan_km && w.plan_km > 0;
+  return `<div class="week ${now?'now':''} ${future?'future':''}">
+    <div class="row"><b>第 ${w.week} 週</b><span class="num">${fmtKm(w.actual_km)} / ${fmtKm(w.plan_km)} km · ${Math.round(p)}%</span></div>
+    <div class="focus">${md(w.start)}–${md(w.end)} · ${esc(w.phase)}${w.focus ? ' · ' + esc(w.focus) : ''}</div>
+    <div class="bar ${complete?'done':''}"><i style="width:${p}%"></i></div></div>`;
+}).join('');
+
+// ---- history (all completed runs except the latest, newest first)
+const hist = rest.filter(r => r !== latest).reverse();
+document.getElementById('history').innerHTML = hist.length ? hist.map(reportCard).join('')
+  : `<div class="empty">更早的紀錄會出現在這裡</div>`;
+
+document.getElementById('built').textContent = D.built;
+</script>
+</body>
+</html>
