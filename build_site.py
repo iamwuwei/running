@@ -368,7 +368,7 @@ function planCard(r, {hi=false, label=''} = {}) {
        <p class="muted">${esc(r.target || '')}</p>
        ${r.note ? `<p class="muted small">📝 ${esc(r.note)}</p>` : ''}`;
   return `<article class="post">
-    <div class="avatar ${hi?'hi':''}">${r.is_rest ? '😴' : r.type === '比賽' ? '🏁' : '🏃'}</div>
+    <div class="avatar ${hi?'hi':''}">${r.type === '肌力' ? '💪' : r.is_rest ? '😴' : r.type === '比賽' ? '🏁' : '🏃'}</div>
     <div><div class="meta"><b>${esc(when)}</b>${label ? `<span class="dim">· ${esc(label)}</span>` : ''} ${typeTag(r)} ${r.plan_km ? `<span class="tag">${fmtKm(r.plan_km)} km</span>` : ''}</div>
     <div class="body">${body}<div class="foot">第 ${r.week} 週 · ${esc(r.phase)}</div></div></div></article>`;
 }
