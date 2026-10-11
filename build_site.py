@@ -5,6 +5,10 @@ Usage:  python3 build_site.py
 Reads   富士山馬拉松_2026_課表.xlsx (sheets 課表 / 週總覽)
 Writes  docs/index.html  (single self-contained page, phone-first)
 
+The page only renders what is in the workbook. The verdict for each run is
+typed by hand into column V (判定) and column W (提醒, items separated by ｜);
+nothing is judged automatically here.
+
 Run this every time the xlsx changes and commit both files together.
 """
 from __future__ import annotations
@@ -12,7 +16,6 @@ from __future__ import annotations
 import datetime as dt
 import json
 import pathlib
-import re
 
 import openpyxl
 
@@ -22,58 +25,15 @@ OUT = ROOT / "docs" / "index.html"
 RACE_DAY = dt.date(2026, 12, 14)
 JST = dt.timezone(dt.timedelta(hours=9))
 
-# 課表 columns (1-based): A 週 B 日期 C 星期 D 階段 E 類型 F 計畫km G 配速/心拍 H 內容 I 備註
+# 課表 columns: A 週 B 日期 C 星期 D 階段 E 類型 F 計畫km G 配速/心拍 H 內容 I 備註
 # J 實際km K 完成 L 心得 M 時間 N 平均配速 O 平均心拍 P 最大心拍 Q 平均功率 R 卡路里 S 天氣 T 鞋 U 裝置
+# V 判定 W 提醒
 COLS = [
     "week", "date", "dow", "phase", "type", "plan_km", "target", "content", "note",
     "actual_km", "done", "memo", "time", "pace", "hr", "hr_max", "power", "kcal",
-    "weather", "shoes", "device",
+    "weather", "shoes", "device", "verdict", "reminder",
 ]
-
-STEADY_TYPES = {"Easy", "Recovery", "Long"}  # types where avg pace / HR can be judged against the target
-
-
-# ---------- parsing helpers ----------
-
-def mmss_to_sec(s) -> int | None:
-    if s is None:
-        return None
-    s = str(s).strip()
-    parts = s.split(":")
-    if not all(p.strip().isdigit() for p in parts) or not 2 <= len(parts) <= 3:
-        return None
-    nums = [int(p) for p in parts]
-    return nums[0] * 3600 + nums[1] * 60 + nums[2] if len(nums) == 3 else nums[0] * 60 + nums[1]
-
-
-def sec_to_mmss(sec: float) -> str:
-    sec = int(round(sec))
-    return f"{sec // 60}:{sec % 60:02d}"
-
-
-def parse_pace_range(target: str | None):
-    """First 'm:ss〜m:ss' in the target string, or 'm:ss+' (lower bound only)."""
-    if not target:
-        return None
-    m = re.search(r"(\d):(\d\d)〜(\d):(\d\d)", target)
-    if m:
-        return (int(m[1]) * 60 + int(m[2]), int(m[3]) * 60 + int(m[4]))
-    m = re.search(r"(\d):(\d\d)\+", target)
-    if m:
-        return (int(m[1]) * 60 + int(m[2]), None)
-    return None
-
-
-def parse_hr_range(target: str | None):
-    if not target:
-        return None
-    m = re.search(r"心拍\s*(\d+)〜(\d+)", target)
-    if m:
-        return (int(m[1]), int(m[2]))
-    m = re.search(r"心拍\s*[≤<]\s*(\d+)", target)
-    if m:
-        return (None, int(m[1]))
-    return None
+VERDICTS = ("達成", "達成但有提醒", "未達成", "跳過")
 
 
 def num(v):
@@ -85,87 +45,12 @@ def num(v):
         return None
 
 
-# ---------- analysis ----------
+def text(v):
+    if v is None:
+        return None
+    s = str(v).strip()
+    return s or None
 
-def analyze(row: dict) -> dict:
-    """Return {'verdict': str, 'status': 'good'|'warn'|'info', 'points': [str]}."""
-    points: list[str] = []
-    flags: list[str] = []
-
-    plan, actual = row["plan_km"], row["actual_km"]
-    if plan and actual is not None:
-        diff = actual - plan
-        pct = diff / plan * 100
-        if abs(diff) < 0.3:
-            points.append(f"距離 {actual:g} km，照課表完成")
-        elif diff > 0:
-            points.append(f"距離 {actual:g} km，比課表多 {diff:.2f} km（+{pct:.0f}%）")
-            if pct > 15:
-                flags.append("over_distance")
-        else:
-            points.append(f"距離 {actual:g} km，比課表少 {-diff:.2f} km（{pct:.0f}%）")
-            flags.append("under_distance")
-
-    time_s = mmss_to_sec(row["time"])
-    pace_s = mmss_to_sec(row["pace"])
-    if pace_s is None and time_s and actual:
-        pace_s = time_s / actual
-    pace_rng = parse_pace_range(row["target"])
-    steady = row["type"] in STEADY_TYPES
-
-    if pace_s is not None:
-        if steady and pace_rng:
-            lo, hi = pace_rng
-            if hi is not None and pace_s < lo:
-                points.append(f"配速 {sec_to_mmss(pace_s)}，比目標下限 {sec_to_mmss(lo)} 快 {int(lo - pace_s)} 秒/km")
-                flags.append("fast")
-            elif hi is not None and pace_s > hi:
-                points.append(f"配速 {sec_to_mmss(pace_s)}，比目標上限 {sec_to_mmss(hi)} 慢 {int(pace_s - hi)} 秒/km，Easy 日沒問題")
-            elif hi is None and pace_s < lo:
-                points.append(f"配速 {sec_to_mmss(pace_s)}，比恢復跑下限 {sec_to_mmss(lo)} 快，再慢一點")
-                flags.append("fast")
-            else:
-                rng = f"{sec_to_mmss(lo)}〜{sec_to_mmss(hi)}" if hi else f"{sec_to_mmss(lo)}+"
-                points.append(f"配速 {sec_to_mmss(pace_s)}，落在目標 {rng} 內")
-        else:
-            points.append(f"平均配速 {sec_to_mmss(pace_s)}")
-
-    hr, hr_max = row["hr"], row["hr_max"]
-    hr_rng = parse_hr_range(row["target"])
-    if hr is not None:
-        hr = int(hr)
-        if steady and hr_rng:
-            lo, hi = hr_rng
-            if hi is not None and hr > hi:
-                points.append(f"平均心拍 {hr}，超過上限 {hi} 有 {hr - hi} bpm" + (f"（最高 {int(hr_max)}）" if hr_max else ""))
-                flags.append("hr_high")
-            elif lo is not None and hr < lo:
-                points.append(f"平均心拍 {hr}，低於目標 {lo}〜{hi}，很輕鬆" + (f"（最高 {int(hr_max)}）" if hr_max else ""))
-            else:
-                rng = f"{lo}〜{hi}" if lo else f"≤{hi}"
-                points.append(f"平均心拍 {hr}，在目標 {rng} 內" + (f"（最高 {int(hr_max)}）" if hr_max else ""))
-        else:
-            points.append(f"平均心拍 {hr}" + (f"，最高 {int(hr_max)}" if hr_max else ""))
-
-    if "hr_high" in flags and "fast" in flags:
-        verdict, status = "跑太快，心拍也飆了。下次 Easy 再慢一點", "warn"
-    elif "hr_high" in flags:
-        verdict, status = "配速沒超速但心拍偏高，當天狀態或天氣影響", "warn"
-    elif "fast" in flags:
-        verdict, status = "配速偏快，心拍還守得住", "warn"
-    elif "under_distance" in flags:
-        verdict, status = "距離沒跑滿，先確認身體狀況", "warn"
-    elif steady and (pace_rng or hr_rng):
-        verdict, status = "完美執行，照課表的強度跑完", "good"
-    else:
-        verdict, status = "已完成", "good"
-    if "over_distance" in flags and status == "good":
-        verdict, status = "完成了，但距離明顯超過課表，別累積太多", "warn"
-
-    return {"verdict": verdict, "status": status, "points": points}
-
-
-# ---------- load ----------
 
 def load_rows() -> list[dict]:
     wb = openpyxl.load_workbook(XLSX, data_only=True)
@@ -174,17 +59,23 @@ def load_rows() -> list[dict]:
     for r in ws.iter_rows(min_row=2, values_only=True):
         if not isinstance(r[1], dt.datetime):
             continue
+        r = tuple(r) + (None,) * (len(COLS) - len(r))
         row = dict(zip(COLS, r[: len(COLS)]))
         row["date"] = row["date"].date().isoformat()
         for k in ("plan_km", "actual_km", "hr", "hr_max", "power", "kcal", "week"):
             row[k] = num(row[k])
         row["week"] = int(row["week"]) if row["week"] is not None else None
-        for k in ("time", "pace"):
-            row[k] = str(row[k]) if row[k] is not None else None
+        for k in ("time", "pace", "memo", "note", "target", "content", "weather", "shoes", "device"):
+            row[k] = text(row[k])
         row["done"] = bool(row["done"]) or row["actual_km"] is not None
         row["is_rest"] = (row["plan_km"] or 0) == 0
-        if row["actual_km"] is not None:
-            row["analysis"] = analyze(row)
+        v = text(row["verdict"])
+        if v and v not in VERDICTS:
+            print(f"  warning: {row['date']} 判定 '{v}' is not one of {VERDICTS}")
+        row["verdict"] = v
+        w = text(row["reminder"])
+        row["reminders"] = [s.strip() for s in w.split("｜") if s.strip()] if w else []
+        del row["reminder"]
         rows.append(row)
     rows.sort(key=lambda x: x["date"])
     return rows
@@ -214,8 +105,6 @@ def load_weeks(rows: list[dict]) -> list[dict]:
     return [weeks[k] for k in sorted(weeks)]
 
 
-# ---------- page ----------
-
 TEMPLATE = r"""<!doctype html>
 <html lang="zh-Hant">
 <head>
@@ -229,6 +118,7 @@ TEMPLATE = r"""<!doctype html>
   --bg:#fff; --surface:#fff; --ink:#0a0a0a; --ink-2:#555; --ink-3:#999;
   --line:#e6e6e6; --chip:#f2f2f2; --accent:#1d6fe0; --accent-soft:#e3edfb;
   --good:#1a8f4e; --good-soft:#e2f4ea; --warn:#c7700a; --warn-soft:#fbeedc;
+  --bad:#c62828; --bad-soft:#fbe3e3; --skip:#6b6b6b; --skip-soft:#ededed;
   --track:#ececec;
 }
 @media (prefers-color-scheme: dark){
@@ -236,6 +126,7 @@ TEMPLATE = r"""<!doctype html>
     --bg:#000; --surface:#000; --ink:#f3f3f3; --ink-2:#a8a8a8; --ink-3:#6f6f6f;
     --line:#262626; --chip:#161616; --accent:#6ea2ff; --accent-soft:#132544;
     --good:#4ccb84; --good-soft:#0f2a1b; --warn:#f0a44a; --warn-soft:#2e1f0a;
+    --bad:#ff7b7b; --bad-soft:#3a1212; --skip:#a3a3a3; --skip-soft:#1c1c1c;
     --track:#1f1f1f;
   }
 }
@@ -261,7 +152,6 @@ header .count{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-num
 .bar.done i{background:var(--good)}
 h2{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;margin:22px 0 6px}
 .post{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
-.post.plain{border-bottom:1px solid var(--line)}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;font-size:18px}
 .avatar.hi{background:var(--accent-soft)}
 .meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:14px}
@@ -271,6 +161,8 @@ h2{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;le
 .tag.accent{background:var(--accent-soft);color:var(--accent)}
 .tag.good{background:var(--good-soft);color:var(--good)}
 .tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.skip{background:var(--skip-soft);color:var(--skip)}
 .body{margin-top:4px}
 .body p{margin:4px 0}
 .title{font-size:16px;font-weight:600;margin:2px 0 4px}
@@ -282,8 +174,10 @@ h2{font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;le
 .stat span{font-size:11px;color:var(--ink-3)}
 .verdict{display:flex;gap:8px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--chip);font-size:14px}
 .verdict.good{background:var(--good-soft)} .verdict.warn{background:var(--warn-soft)}
+.verdict.bad{background:var(--bad-soft)} .verdict.skip{background:var(--skip-soft)}
 .verdict .dot{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--ink-3)}
 .verdict.good .dot{background:var(--good)} .verdict.warn .dot{background:var(--warn)}
+.verdict.bad .dot{background:var(--bad)} .verdict.skip .dot{background:var(--skip)}
 ul.points{margin:8px 0 0;padding-left:0;list-style:none;color:var(--ink-2);font-size:14px}
 ul.points li{padding-left:14px;position:relative;margin:3px 0}
 ul.points li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
@@ -296,13 +190,9 @@ ul.points li::before{content:"";position:absolute;left:0;top:9px;width:5px;heigh
 .week .focus{color:var(--ink-3);font-size:12px;margin-top:2px}
 .week.now .row b::after{content:"本週";margin-left:6px;font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:999px}
 .week.future{opacity:.6}
-.next-list .post:first-child .avatar{background:var(--accent-soft)}
 .empty{color:var(--ink-3);padding:14px 0;border-bottom:1px solid var(--line)}
 footer{padding:28px 0 40px;color:var(--ink-3);font-size:12px;text-align:center}
 footer a{color:var(--ink-2)}
-details summary{cursor:pointer;color:var(--ink-2);font-size:13px;padding:12px 0;list-style:none}
-details summary::-webkit-details-marker{display:none}
-details summary::after{content:" ▾"} details[open] summary::after{content:" ▴"}
 </style>
 </head>
 <body>
@@ -340,9 +230,13 @@ const jst = new Date(Date.now() + 9*3600*1000);
 const today = jst.toISOString().slice(0,10);
 const race = D.race_day;
 const dayDiff = (a,b) => Math.round((Date.parse(b) - Date.parse(a)) / 86400000);
+const addDays = (iso, n) => new Date(Date.parse(iso) + n*86400000).toISOString().slice(0,10);
 const md = iso => `${+iso.slice(5,7)}/${+iso.slice(8,10)}`;
 const dowName = r => r.dow ? `週${r.dow}` : '';
 const typeTag = r => r.is_rest ? '' : `<span class="tag accent">${esc(r.type)}</span>`;
+const avatarFor = r => r.type === '肌力' ? '💪' : r.is_rest ? '😴' : r.type === '比賽' ? '🏁' : '🏃';
+// verdict text (column V) -> colour class; anything else renders neutral
+const VERDICT_CLASS = {'達成':'good', '達成但有提醒':'warn', '未達成':'bad', '跳過':'skip'};
 
 // ---- header / hero
 const toRace = dayDiff(today, race);
@@ -368,34 +262,34 @@ function planCard(r, {hi=false, label=''} = {}) {
        <p class="muted">${esc(r.target || '')}</p>
        ${r.note ? `<p class="muted small">📝 ${esc(r.note)}</p>` : ''}`;
   return `<article class="post">
-    <div class="avatar ${hi?'hi':''}">${r.type === '肌力' ? '💪' : r.is_rest ? '😴' : r.type === '比賽' ? '🏁' : '🏃'}</div>
+    <div class="avatar ${hi?'hi':''}">${avatarFor(r)}</div>
     <div><div class="meta"><b>${esc(when)}</b>${label ? `<span class="dim">· ${esc(label)}</span>` : ''} ${typeTag(r)} ${r.plan_km ? `<span class="tag">${fmtKm(r.plan_km)} km</span>` : ''}</div>
     <div class="body">${body}<div class="foot">第 ${r.week} 週 · ${esc(r.phase)}</div></div></div></article>`;
 }
-function addDays(iso, n){ const d = new Date(Date.parse(iso) + n*86400000); return d.toISOString().slice(0,10); }
 
-// ---- report card (completed run)
+// ---- report card (completed run): numbers from the sheet, verdict from V/W verbatim
 function reportCard(r) {
-  const a = r.analysis || {};
+  const vcls = r.verdict ? (VERDICT_CLASS[r.verdict] || '') : '';
   const stats = [
-    [`課表\u00a0${fmtKm(r.plan_km)}\u00a0km`, r.actual_km != null ? `${fmtKm(r.actual_km)} km` : null, null],
+    [`課表 ${fmtKm(r.plan_km)} km`, r.actual_km != null ? `${fmtKm(r.actual_km)} km` : null, null],
     ['時間', r.time, null],
     ['配速', r.pace ? `${r.pace}/km` : null, null],
-    ['心拍', r.hr != null ? `${Math.round(r.hr)}` : null, r.hr_max ? `最高\u00a0${Math.round(r.hr_max)}` : null],
+    ['心拍', r.hr != null ? `${Math.round(r.hr)}` : null, r.hr_max ? `最高 ${Math.round(r.hr_max)}` : null],
     ['卡路里', r.kcal != null ? `${Math.round(r.kcal)}` : null, null],
     ['功率', r.power != null ? `${Math.round(r.power)} W` : null, null],
   ].filter(s => s[1]);
+  const verdictBlock = r.verdict ? `<div class="verdict ${vcls}"><span class="dot"></span><div><b>${esc(r.verdict)}</b>
+      ${r.reminders.length ? `<ul class="points">${r.reminders.map(p => `<li>${esc(p)}</li>`).join('')}</ul>` : ''}</div></div>` : '';
   return `<article class="post">
-    <div class="avatar">🏃</div>
+    <div class="avatar">${avatarFor(r)}</div>
     <div>
       <div class="meta"><b>${md(r.date)} ${dowName(r)}</b><span class="dim">· 第 ${r.week} 週</span> ${typeTag(r)}
-        <span class="tag ${a.status||''}">${esc(a.status === 'good' ? '達成' : a.status === 'warn' ? '注意' : '完成')}</span></div>
+        ${r.verdict ? `<span class="tag ${vcls}">${esc(r.verdict)}</span>` : ''}</div>
       <div class="body">
         <div class="title">${esc(r.content)}</div>
         ${r.memo ? `<p class="memo">${esc(r.memo)}</p>` : ''}
         <div class="stats">${stats.map(([k,v,sub]) => `<div class="stat"><b>${esc(v)}</b><span>${esc(k)}${sub ? ' · ' + esc(sub) : ''}</span></div>`).join('')}</div>
-        ${a.verdict ? `<div class="verdict ${a.status}"><span class="dot"></span><div><b>${esc(a.verdict)}</b>
-          <ul class="points">${(a.points||[]).map(p => `<li>${esc(p)}</li>`).join('')}</ul></div></div>` : ''}
+        ${verdictBlock}
         <div class="foot">${[r.weather, r.shoes, r.device].filter(Boolean).map(esc).join(' · ')}</div>
       </div>
     </div></article>`;
@@ -413,7 +307,7 @@ document.getElementById('next').innerHTML = upcoming.length
   ? upcoming.map((r,i) => planCard(r, {hi:i===0, label: `${dayDiff(today, r.date)} 天後`})).join('')
   : `<div class="empty">沒有後續課表</div>`;
 
-// ---- latest report
+// ---- latest report = newest run not already shown as today; history = the rest
 const shownToday = todayRow && todayRow.actual_km != null ? todayRow : null;
 const rest = done.filter(r => r !== shownToday);
 const latest = rest.length ? rest[rest.length-1] : null;
@@ -432,7 +326,7 @@ document.getElementById('weeks').innerHTML = D.weeks.map(w => {
     <div class="bar ${complete?'done':''}"><i style="width:${p}%"></i></div></div>`;
 }).join('');
 
-// ---- history (all completed runs except the latest, newest first)
+// ---- history (newest first)
 const hist = rest.filter(r => r !== latest).reverse();
 document.getElementById('history').innerHTML = hist.length ? hist.map(reportCard).join('')
   : `<div class="empty">更早的紀錄會出現在這裡</div>`;
@@ -459,7 +353,7 @@ def build() -> None:
     done = [r for r in rows if r["actual_km"] is not None]
     print(f"wrote {OUT.relative_to(ROOT)}  rows={len(rows)} completed={len(done)} weeks={len(weeks)}")
     for r in done:
-        print(f"  {r['date']} {r['type']:<8} {r['actual_km']:>5} km  -> {r['analysis']['status']}: {r['analysis']['verdict']}")
+        print(f"  {r['date']} {r['type']:<8} {r['actual_km']:>5} km  判定={r['verdict'] or '（未評）'}  提醒={len(r['reminders'])} 條")
 
 
 if __name__ == "__main__":
